@@ -7,7 +7,7 @@ from struct import pack
 # Create a UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-host, port = '192.168.0.8', 65000
+host, port = '192.168.1.106', 65000
 server_address = (host, port)
 
 # Generate some random start values
@@ -20,7 +20,6 @@ for i in range(10):
     message = pack('3f', x, y, z)
     sock.sendto(message, server_address)
 
-    sleep(1)
     x += 1
     y += 1
     z += 1
