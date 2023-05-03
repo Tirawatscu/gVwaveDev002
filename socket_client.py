@@ -10,13 +10,13 @@ server_address = (host, port)
 def send_samples(num_samples):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(server_address)
-    print("Connected")
 
     try:
         x, y, z = random.random(), random.random(), random.random()
 
         for i in range(num_samples):
             message = pack('3f', x, y, z)
+            print(f"Sending sample {i+1}: X: {x}, Y: {y}, Z: {z}")
             sock.sendall(message)
 
             x += 1
@@ -25,3 +25,4 @@ def send_samples(num_samples):
 
     finally:
         sock.close()
+
