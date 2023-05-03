@@ -22,6 +22,7 @@ for i in range(2048):
     message = pack('3f', x, y, z)
     sock.sendall(message)
 
+    sleep(1/128)
     x += 1
     y += 1
     z += 1
