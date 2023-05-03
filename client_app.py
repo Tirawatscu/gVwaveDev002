@@ -1,5 +1,5 @@
 import socket
-from struct import unpack
+from struct import unpack, pack
 import random
 
 server_ip = '192.168.1.106'

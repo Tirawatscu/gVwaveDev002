@@ -9,7 +9,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 class SocketServer:
-    def __init__(self, host='0.0.0.0', port=5001):
+    def __init__(self, host='0.0.0.0', port=65000):
         self.host = host
         self.port = port
         self.server_address = (host, port)
@@ -60,5 +60,5 @@ if __name__ == '__main__':
     server_process = Process(target=socket_server.run_server)
     server_process.start()
 
-    socketio.run(app, debug=True, host='0.0.0.0', port=65000, use_reloader=False)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5001, use_reloader=False)
 
