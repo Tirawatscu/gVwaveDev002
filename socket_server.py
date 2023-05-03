@@ -35,5 +35,3 @@ def run_server():
         finally:
             connection.close()
 
-def start_client():
-    socket_client.send_samples()

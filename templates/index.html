@@ -1,14 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Sample App</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Sender</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js" integrity="sha384-KAZ4DtF8kCQ3TJ3EFF3kouhx+gudZwHutvmKjAwxrrDV9yAb9zQAFFWjLJpTJ/30" crossorigin="anonymous"></script>
 </head>
 <body>
-  <form method="POST" action="{{ url_for('index') }}">
-    <label for="num_samples">Number of Samples:</label>
-    <input type="number" name="num_samples" required>
-    <button type="submit">Start Client</button>
-  </form>
+    <form method="post">
+        <label for="num_samples">Number of samples:</label>
+        <input type="text" name="num_samples" id="num_samples">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        const socket = io.connect(`http://${window.location.hostname}:5001`);
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+        });
+    </script>
 </body>
 </html>
