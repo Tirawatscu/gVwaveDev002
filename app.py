@@ -55,6 +55,7 @@ def index():
     return render_template('index.html')
 
 
+
 if __name__ == '__main__':
     server_process = Process(target=socket_server.run_server)
     server_process.start()
