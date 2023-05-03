@@ -6,8 +6,14 @@ app = Flask(__name__)
 socketio = SocketIO(app, async_mode='threading')
 
 @socketio.on('connect')
-def handle_connect():
+def on_connect():
     print("WebSocket connected")
+    # Rest of your code
+
+@socketio.on('start_signal_response')
+def on_start_signal_response(data):
+    print(f"Received response from server: {data}")
+
     
 @socketio.on('start')
 def handle_start(data):
