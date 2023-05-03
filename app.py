@@ -10,7 +10,6 @@ socketio = SocketIO(app)
 def index():
     if request.method == 'POST':
         num_samples = int(request.form['num_samples'])
-        socket_server.set_num_samples(num_samples)
         socketio.emit('start', {'num_samples': num_samples})
         return redirect(url_for('index'))
     return render_template('index.html')
