@@ -30,6 +30,8 @@ def client_listen():
         if start_signal:
             print(f"Received start signal with {num_samples} samples")
             send_samples(sock, num_samples)
+        else:
+            print("No start signal received. Waiting...")
 
     sock.close()
 
