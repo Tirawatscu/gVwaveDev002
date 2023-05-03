@@ -4,7 +4,7 @@ from time import sleep
 import random
 from struct import pack
 
-host, port = '192.168.0.106', 65000
+host, port = '192.168.1.106', 65000
 server_address = (host, port)
 
 # Create a TCP socket
