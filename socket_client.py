@@ -24,5 +24,3 @@ def send_samples(num_samples):
 
     finally:
         sock.close()
-
-# ... rest of the socket_client.py code
