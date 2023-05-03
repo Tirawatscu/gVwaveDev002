@@ -1,27 +1,37 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO
-import socket_client
+import socket
+from struct import unpack
+import random
 
-app = Flask(__name__)
-socketio = SocketIO(app, async_mode='threading')
+server_ip = '192.168.1.106'
+server_port = 65000
+server_address = (server_ip, server_port)
 
-@socketio.on('connect')
-def on_connect():
-    print("WebSocket connected")
-    # Rest of your code
+def receive_start_signal(sock):
+    data = sock.recv(8)
+    num_samples, start_signal = unpack('2i', data)
+    return num_samples, start_signal
 
-@socketio.on('start_signal_response')
-def on_start_signal_response(data):
-    print(f"Received response from server: {data}")
+def send_samples(sock, num_samples):
+    for i in range(num_samples):
+        x, y, z = random.random(), random.random(), random.random()
+        message = pack('3f', x, y, z)
+        print(f"Sending sample {i+1}: X: {x}, Y: {y}, Z: {z}")
+        sock.sendall(message)
+        x += 1
+        y += 1
+        z += 1
 
-    
-@socketio.on('start')
-def handle_start(data):
-    num_samples = data['num_samples']
-    print(f"Received start signal with {num_samples} samples")
-    socket_client.send_samples(num_samples)
+def client_listen():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(server_address)
 
+    while True:
+        num_samples, start_signal = receive_start_signal(sock)
+        if start_signal:
+            print(f"Received start signal with {num_samples} samples")
+            send_samples(sock, num_samples)
 
+    sock.close()
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=65000)
+    client_listen()
