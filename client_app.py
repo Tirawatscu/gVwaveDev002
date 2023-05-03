@@ -7,9 +7,12 @@ server_port = 65000
 server_address = (server_ip, server_port)
 
 def receive_start_signal(sock):
-    data = sock.recv(8)
+    data = b''
+    while len(data) < 8:
+        data += sock.recv(8 - len(data))
     num_samples, start_signal = unpack('2i', data)
     return num_samples, start_signal
+
 
 def send_samples(sock, num_samples):
     for i in range(num_samples):
