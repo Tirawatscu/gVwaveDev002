@@ -20,7 +20,7 @@ while True:
 
     try:
         # Send the number of samples and the signal to start
-        num_samples = 10
+        num_samples = 2000
         start_signal = 1
         message = pack('1i1i', num_samples, start_signal)
         connection.sendall(message)

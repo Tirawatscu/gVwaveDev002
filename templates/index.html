@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample App</title>
+</head>
+<body>
+  <form method="POST" action="{{ url_for('index') }}">
+    <label for="num_samples">Number of Samples:</label>
+    <input type="number" name="num_samples" required>
+    <button type="submit">Start Client</button>
+  </form>
+</body>
+</html>
