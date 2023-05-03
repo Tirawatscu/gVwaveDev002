@@ -5,6 +5,10 @@ import socket_client
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+@socketio.on('connect')
+def handle_connect():
+    print("WebSocket connected")
+    
 @socketio.on('start')
 def handle_start(data):
     num_samples = data['num_samples']
