@@ -1,11 +1,18 @@
 import socket
-from struct import unpack
+from struct import unpack, pack
 
 host, port = '0.0.0.0', 65000
 server_address = (host, port)
 
+num_samples = 10
+
+def set_num_samples(samples):
+    global num_samples
+    num_samples = samples
+
 def run_server():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print(f'Starting TCP server on {host} port {port}')
     sock.bind(server_address)
     sock.listen(1)
@@ -15,10 +22,12 @@ def run_server():
         print(f'Connection from {client_address}')
 
         try:
-            while True:
+            start_signal = 1
+            message = pack('1i1i', num_samples, start_signal)
+            connection.sendall(message)
+
+            for _ in range(num_samples):
                 message = connection.recv(12)
-                if not message:
-                    break
                 print(f'Received {len(message)} bytes:')
                 x, y, z = unpack('3f', message)
                 print(f'X: {x}, Y: {y}, Z: {z}')
