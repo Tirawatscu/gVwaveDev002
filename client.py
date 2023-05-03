@@ -17,7 +17,7 @@ sock.connect(server_address)
 x, y, z = random.random(), random.random(), random.random()
 
 # Send a few messages
-for i in range(10):
+for i in range(2048):
     # Pack three 32-bit floats into message and send
     message = pack('3f', x, y, z)
     sock.sendall(message)
