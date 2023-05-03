@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 import socket_client
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='threading')
 
 @socketio.on('connect')
 def handle_connect():
