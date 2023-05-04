@@ -35,6 +35,8 @@ def get_data():
         return jsonify(received_data)
 
 
+import json
+
 def handle_client_connection(conn, addr):
     global current_command, command_processed, received_data
     while True:
@@ -56,13 +58,14 @@ def handle_client_connection(conn, addr):
                     data += chunk
                     remaining_data -= len(chunk)
 
-                received_data = list(map(float, data.decode().split(',')))
+                received_data = json.loads(data.decode())  # Deserialize JSON data
                 print(f"Received random data: {received_data}")
                 command_processed = True
             except Exception as e:
                 print(f"Error in handle_client_connection: {e}")
                 break
     conn.close()
+
 
 
 

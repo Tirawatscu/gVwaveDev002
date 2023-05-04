@@ -57,6 +57,8 @@ def collect_adc_data(duration):
 
 
 
+import json
+
 def main():
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -78,7 +80,7 @@ def main():
                         print(actual_sampling_rate)
 
                         if ready_to_write:
-                            data_to_send = ','.join(map(str, random_data)).encode()
+                            data_to_send = json.dumps(random_data).encode()  # Serialize data to JSON
                             s.sendall(str(len(data_to_send)).encode().zfill(8))  # Send data length
                             s.sendall(data_to_send)  # Send the actual data
                             print(f"Sent random data: {random_data}")
@@ -92,6 +94,7 @@ def main():
             time.sleep(5)
         finally:
             s.close()
+
 
 
 if __name__ == '__main__':
