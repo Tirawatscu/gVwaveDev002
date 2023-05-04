@@ -42,17 +42,20 @@ def handle_client_connection(conn, addr):
             try:
                 command_to_send = current_command
                 conn.sendall(str(command_to_send).encode())
-                
+
+                # Receive the length of the data
+                data_length = int(conn.recv(8).decode())
+
                 # Receive data in chunks
                 data = b""
-                while True:
-                    chunk = conn.recv(4096)
+                remaining_data = data_length
+                while remaining_data > 0:
+                    chunk = conn.recv(min(remaining_data, 4096))
                     if not chunk:
                         break
                     data += chunk
-                    if len(chunk) < 4096:
-                        break
-                
+                    remaining_data -= len(chunk)
+
                 received_data = list(map(float, data.decode().split(',')))
                 print(f"Received random data: {received_data}")
                 command_processed = True
@@ -60,6 +63,7 @@ def handle_client_connection(conn, addr):
                 print(f"Error in handle_client_connection: {e}")
                 break
     conn.close()
+
 
 
 

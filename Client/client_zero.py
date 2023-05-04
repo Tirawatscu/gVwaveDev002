@@ -76,10 +76,11 @@ def main():
                         duration = int(sample_count/sampling_rate)
                         random_data, actual_sampling_rate = collect_adc_data(duration)
                         print(actual_sampling_rate)
-                        
+
                         if ready_to_write:
-                            #Sent only first channel
-                            s.sendall(','.join(map(str, random_data[0])).encode())
+                            data_to_send = ','.join(map(str, random_data)).encode()
+                            s.sendall(str(len(data_to_send)).encode().zfill(8))  # Send data length
+                            s.sendall(data_to_send)  # Send the actual data
                             print(f"Sent random data: {random_data}")
                     else:
                         break
@@ -91,6 +92,7 @@ def main():
             time.sleep(5)
         finally:
             s.close()
+
 
 if __name__ == '__main__':
     main()
