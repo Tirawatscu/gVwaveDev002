@@ -78,7 +78,8 @@ def main():
                         print(actual_sampling_rate)
                         
                         if ready_to_write:
-                            s.sendall(','.join(map(str, random_data)).encode())
+                            #Sent only first channel
+                            s.sendall(','.join(map(str, random_data[0])).encode())
                             print(f"Sent random data: {random_data}")
                     else:
                         break
