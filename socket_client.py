@@ -1,8 +1,9 @@
 import socket
 import random
 from struct import pack
+import struct
 
-server_ip = '192.168.1.106'  # Replace with the server's IP address
+server_ip = '192.168.1.36'  # Replace with the server's IP address
 
 host, port = server_ip, 5001
 server_address = (host, port)
@@ -12,17 +13,15 @@ def send_samples(num_samples):
     sock.connect(server_address)
 
     try:
-        x, y, z = random.random(), random.random(), random.random()
-
-        for i in range(num_samples):
-            message = pack('3f', x, y, z)
+        while True:
+            x, y, z = random.random(), random.random(), random.random()
+            message = struct.pack('3f', x, y, z)
             print(f"Sending sample {i+1}: X: {x}, Y: {y}, Z: {z}")
             sock.sendall(message)
 
-            x += 1
-            y += 1
-            z += 1
+            data = sock.recv(8)
+            if data == b'stop':
+                break
 
     finally:
         sock.close()
-

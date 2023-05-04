@@ -1,64 +1,81 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_socketio import SocketIO
 import socket
-from struct import unpack, pack
-import random
-from multiprocessing import Process
+from threading import Thread
+from flask import Flask, render_template, request, redirect
+import time
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 
-class SocketServer:
-    def __init__(self, host='0.0.0.0', port=65000):
-        self.host = host
-        self.port = port
-        self.server_address = (host, port)
-        self.num_samples = 10
-
-    def set_num_samples(self, samples):
-        self.num_samples = samples
-
-    def run_server(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f'Starting TCP server on {self.host} port {self.port}')
-        sock.bind(self.server_address)
-        sock.listen(1)
-
-        while True:
-            connection, client_address = sock.accept()
-            print(f'Connection from {client_address}')
-
-            try:
-                start_signal = 1
-                message = pack('1i1i', self.num_samples, start_signal)
-                connection.sendall(message)
-
-                for _ in range(self.num_samples):
-                    message = connection.recv(12)
-                    print(f'Received {len(message)} bytes:')
-                    x, y, z = unpack('3f', message)
-                    print(f'X: {x}, Y: {y}, Z: {z}')
-
-            finally:
-                connection.close()
-
-socket_server = SocketServer()
+current_command = 0
+command_processed = True
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global current_command, command_processed
     if request.method == 'POST':
-        num_samples = int(request.form['num_samples'])
-        socket_server.set_num_samples(num_samples)
-        print(f"Sending start signal with {num_samples} samples")
-        socketio.emit('start', {'num_samples': num_samples})
-        return redirect(url_for('index'))
-    return render_template('index.html')
+        current_command = int(request.form['command'])
+        command_processed = False
+        return redirect('/')
+    else:
+        return render_template('index.html')
+    
+from flask import jsonify
 
+# Add a new global variable to store the received data
+received_data = []
+
+@app.route('/get_data', methods=['POST'])
+def get_data():
+    global current_command, command_processed, received_data
+    if request.method == 'POST':
+        current_command = int(request.form['command'])
+        command_processed = False
+        # Wait until the command is processed
+        while not command_processed:
+            time.sleep(0.1)
+        return jsonify(received_data)
+
+
+def handle_client_connection(conn, addr):
+    global current_command, command_processed, received_data
+    while True:
+        if not command_processed:
+            try:
+                command_to_send = current_command
+                conn.sendall(str(command_to_send).encode())
+                
+                # Receive data in chunks
+                data = b""
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    data += chunk
+                    if len(chunk) < 4096:
+                        break
+                
+                received_data = list(map(float, data.decode().split(',')))
+                print(f"Received random data: {received_data}")
+                command_processed = True
+            except Exception as e:
+                print(f"Error in handle_client_connection: {e}")
+                break
+    conn.close()
+
+
+
+def start_server(port):
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('0.0.0.0', port))
+    server.listen(5)
+
+    print(f"Listening on port {port}")
+
+    while True:
+        conn, addr = server.accept()
+        print(f"Connected on port {port} by {addr}")
+        Thread(target=handle_client_connection, args=(conn, addr)).start()
 
 
 if __name__ == '__main__':
-    server_process = Process(target=socket_server.run_server)
-    server_process.start()
-
-    socketio.run(app, debug=True, host='0.0.0.0', port=5001, use_reloader=False)
-
+    Thread(target=start_server, args=(5001,)).start()
+    app.run(host='0.0.0.0', port=8080)
