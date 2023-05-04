@@ -68,8 +68,8 @@ def main():
                     if data:
                         sample_count = int(data.decode())
                         print(f"Received sample_count: {sample_count}")
-                        duration = int(sample_count*sampling_rate)
-                        random_data = collect_adc_data(sample_count)
+                        duration = int(sample_count/sampling_rate)
+                        random_data = collect_adc_data(duration)
                         
                         if ready_to_write:
                             s.sendall(','.join(map(str, random_data)).encode())
