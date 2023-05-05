@@ -19,7 +19,7 @@ def main():
         s.settimeout(5)
 
         try:
-            s.connect(('192.168.1.39', 5001))
+            s.connect(('192.168.1.36', 5001))
             print("Connected to the server")
             while True:
                 ready_to_read, ready_to_write, _ = select.select([s], [s], [], 1)
