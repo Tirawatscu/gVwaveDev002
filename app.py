@@ -33,7 +33,14 @@ def get_data():
         # Wait until the command is processed
         while not command_processed:
             time.sleep(0.1)
-        return jsonify(received_data)
+
+        # Convert the data to a format suitable for plotting
+        plot_data = []
+        for channel, values in received_data.items():
+            for i, value in enumerate(values):
+                plot_data.append({'channel': int(channel), 'sample': i, 'value': value})
+
+        return jsonify(plot_data)
 
 
 import json
