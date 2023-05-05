@@ -74,7 +74,7 @@ def main(ipaddr, port):
                     if data:
                         sample_count = int(data.decode())
                         print(f"Received sample_count: {sample_count}")
-                        duration = int(sample_count/sampling_rate)
+                        duration = sample_count/sampling_rate
                         random_data, actual_sampling_rate = collect_adc_data(duration)
                         print(actual_sampling_rate)
 
