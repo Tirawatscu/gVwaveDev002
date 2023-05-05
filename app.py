@@ -1,3 +1,4 @@
+#Server
 import socket
 from threading import Thread
 from flask import Flask, render_template, request, redirect
@@ -58,17 +59,13 @@ def handle_client_connection(conn, addr):
                     data += chunk
                     remaining_data -= len(chunk)
                 
-                received_data = json.loads(data.decode())['0']  # Deserialize JSON data
+                received_data = json.loads(data.decode())  # Deserialize JSON data
                 print(f"Received random data: {received_data}")
                 command_processed = True
             except Exception as e:
                 print(f"Error in handle_client_connection: {e}")
                 break
     conn.close()
-
-
-
-
 
 def start_server(port):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,7 +78,6 @@ def start_server(port):
         conn, addr = server.accept()
         print(f"Connected on port {port} by {addr}")
         Thread(target=handle_client_connection, args=(conn, addr)).start()
-
 
 if __name__ == '__main__':
     Thread(target=start_server, args=(5001,)).start()

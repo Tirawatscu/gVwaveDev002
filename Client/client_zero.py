@@ -1,3 +1,4 @@
+#Client
 import socket
 import random
 import time
@@ -28,10 +29,9 @@ def generate_random_data(sample_count):
 
 def collect_adc_data(duration):
     global ADC
-    channelList = [0]
+    channelList = [0, 1, 2] # Updated channel list to include three channels
     start_time = time.perf_counter()
     ADC_Value_List = []
-
     sampling_rate = 128  # Hz
     interval = 1 / sampling_rate
     next_sample_time = start_time + interval
@@ -57,12 +57,10 @@ def collect_adc_data(duration):
                 converted_data[channel].append(value * REF / 0x7fffffff)
     return converted_data, actual_sampling_rate
 
-
 def main(ipaddr, port):
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(5)
-
         try:
             s.connect((ipaddr, port))  # Use the ipaddr and port arguments
             print("Connected to the server")
@@ -93,8 +91,7 @@ def main(ipaddr, port):
             time.sleep(5)
         finally:
             s.close()
-
-
+            
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("Usage: python client_zero.py ipaddr port")
@@ -102,4 +99,3 @@ if __name__ == '__main__':
         ipaddr = sys.argv[1]
         port = int(sys.argv[2])
         main(ipaddr, port)
-
