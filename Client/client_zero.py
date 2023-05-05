@@ -2,6 +2,8 @@ import socket
 import random
 import time
 import select
+import sys
+import json
 
 import platform
 os = platform.system()
@@ -56,16 +58,13 @@ def collect_adc_data(duration):
     return converted_data, actual_sampling_rate
 
 
-
-import json
-
-def main():
+def main(ipaddr, port):
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(5)
 
         try:
-            s.connect(('192.168.1.39', 5001))
+            s.connect((ipaddr, port))  # Use the ipaddr and port arguments
             print("Connected to the server")
             while True:
                 ready_to_read, ready_to_write, _ = select.select([s], [s], [], 1)
@@ -96,7 +95,11 @@ def main():
             s.close()
 
 
-
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 3:
+        print("Usage: python client_zero.py ipaddr port")
+    else:
+        ipaddr = sys.argv[1]
+        port = int(sys.argv[2])
+        main(ipaddr, port)
 

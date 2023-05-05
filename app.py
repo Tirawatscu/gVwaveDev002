@@ -57,8 +57,8 @@ def handle_client_connection(conn, addr):
                         break
                     data += chunk
                     remaining_data -= len(chunk)
-
-                received_data = json.loads(data.decode())  # Deserialize JSON data
+                
+                received_data = json.loads(data.decode())['0']  # Deserialize JSON data
                 print(f"Received random data: {received_data}")
                 command_processed = True
             except Exception as e:
