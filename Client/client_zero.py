@@ -21,8 +21,9 @@ if (ADC.ADS1263_init_ADC1('ADS1263_14400SPS') == -1):
     print("Failed to initialize ADC1")
     exit()
 ADC.ADS1263_SetMode(1)
+
 sampling_rate = 5000  # Hz
-sleep_duration = 1 / sampling_rate
+interval = 1 / sampling_rate
 
 def generate_random_data(sample_count):
     return [round(random.uniform(0, 100), 2) for _ in range(sample_count)]
@@ -32,8 +33,7 @@ def collect_adc_data(duration):
     channelList = [0, 1, 2] # Updated channel list to include three channels
     start_time = time.perf_counter()
     ADC_Value_List = []
-    sampling_rate = 128  # Hz
-    interval = 1 / sampling_rate
+
     next_sample_time = start_time + interval
     no_sample = duration * sampling_rate
 
