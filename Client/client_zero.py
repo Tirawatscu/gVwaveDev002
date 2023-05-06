@@ -30,7 +30,7 @@ def generate_random_data(sample_count):
 
 def collect_adc_data(duration):
     global ADC
-    channelList = [0, 1, 2] # Updated channel list to include three channels
+    channelList = [0, 1, 2]  # Updated channel list to include three channels
     start_time = time.perf_counter()
     ADC_Value_List = []
 
@@ -44,9 +44,9 @@ def collect_adc_data(duration):
         if current_time >= next_sample_time:
             ADC_Value = ADC.ADS1263_GetAll(channelList)
             ADC_Value_List.append(ADC_Value)
-            next_sample_time = current_time + interval
+            next_sample_time += interval  # Update next_sample_time based on the interval
 
-    actual_sampling_rate = len(ADC_Value_List) / (current_time - start_time)  # Add a small value to the denominator
+    actual_sampling_rate = len(ADC_Value_List) / (current_time - start_time)
 
     converted_data = {channel: [] for channel in channelList}
     for data in ADC_Value_List:
@@ -57,6 +57,7 @@ def collect_adc_data(duration):
                 converted_data[channel].append(value * REF / 0x7fffffff)
     print(f"actual_sampling_rate = {actual_sampling_rate}")
     return converted_data, actual_sampling_rate
+
 
 def main(ipaddr, port):
     while True:
