@@ -16,7 +16,7 @@ REF = 5.08          # Modify according to actual voltage
                     # external AVDD and AVSS(Default), or internal 2.5V
                     
 ADC = ADS1263.ADS1263()
-if (ADC.ADS1263_init_ADC1('ADS1263_7200SPS') == -1):
+if (ADC.ADS1263_init_ADC1('ADS1263_14400SPS') == -1):
     ADC.ADS1263_Exit()
     print("Failed to initialize ADC1")
     exit()
