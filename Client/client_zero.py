@@ -22,7 +22,7 @@ if (ADC.ADS1263_init_ADC1('ADS1263_7200SPS') == -1):
     exit()
 ADC.ADS1263_SetMode(1)
 
-sampling_rate = 5000  # Hz
+sampling_rate = 128  # Hz
 interval = 1 / sampling_rate
 
 def generate_random_data(sample_count):
