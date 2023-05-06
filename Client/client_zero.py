@@ -21,7 +21,7 @@ if (ADC.ADS1263_init_ADC1('ADS1263_14400SPS') == -1):
     print("Failed to initialize ADC1")
     exit()
 ADC.ADS1263_SetMode(1)
-sampling_rate = 128  # Hz
+sampling_rate = 5000  # Hz
 sleep_duration = 1 / sampling_rate
 
 def generate_random_data(sample_count):
