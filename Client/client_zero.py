@@ -55,6 +55,7 @@ def collect_adc_data(duration):
                 converted_data[channel].append(-(REF * 2 - value * REF / 0x80000000))
             else:
                 converted_data[channel].append(value * REF / 0x7fffffff)
+    print(f"actual_sampling_rate = {actual_sampling_rate}")
     return converted_data, actual_sampling_rate
 
 def main(ipaddr, port):
