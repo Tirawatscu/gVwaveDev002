@@ -16,7 +16,7 @@ REF = 5.08          # Modify according to actual voltage
                     # external AVDD and AVSS(Default), or internal 2.5V
                     
 ADC = ADS1263.ADS1263()
-if (ADC.ADS1263_init_ADC1('ADS1263_14400SPS') == -1):
+if (ADC.ADS1263_init_ADC1('ADS1263_7200SPS') == -1):
     ADC.ADS1263_Exit()
     print("Failed to initialize ADC1")
     exit()
@@ -46,7 +46,7 @@ def collect_adc_data(duration):
             ADC_Value_List.append(ADC_Value)
             next_sample_time = current_time + interval
 
-    actual_sampling_rate = len(ADC_Value_List) / (current_time - start_time + 1e-9)  # Add a small value to the denominator
+    actual_sampling_rate = len(ADC_Value_List) / (current_time - start_time)  # Add a small value to the denominator
 
     converted_data = {channel: [] for channel in channelList}
     for data in ADC_Value_List:
@@ -74,13 +74,12 @@ def main(ipaddr, port):
                         print(f"Received sample_count: {sample_count}")
                         duration = sample_count/sampling_rate
                         random_data, actual_sampling_rate = collect_adc_data(duration)
-                        print(actual_sampling_rate)
 
                         if ready_to_write:
                             data_to_send = json.dumps(random_data).encode()  # Serialize data to JSON
                             s.sendall(str(len(data_to_send)).encode().zfill(8))  # Send data length
                             s.sendall(data_to_send)  # Send the actual data
-                            print(f"Sent random data: {random_data}")
+                            #print(f"Sent random data: {random_data}")
                     else:
                         break
 
