@@ -5,6 +5,9 @@ import time
 import select
 import sys
 import json
+import platform
+import uuid
+
 
 import platform
 os = platform.system()
@@ -58,13 +61,18 @@ def collect_adc_data(duration):
     print(f"actual_sampling_rate = {actual_sampling_rate}")
     return converted_data, actual_sampling_rate
 
+def get_mac_address():
+    mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
+    return ":".join([mac[i:i + 2] for i in range(0, 11, 2)])
 
 def main(ipaddr, port):
+    mac_address = get_mac_address()
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(5)
         try:
             s.connect((ipaddr, port))  # Use the ipaddr and port arguments
+            s.sendall(mac_address.encode())
             print("Connected to the server")
             while True:
                 ready_to_read, ready_to_write, _ = select.select([s], [s], [], 1)

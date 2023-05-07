@@ -3,6 +3,8 @@ import socket
 from threading import Thread
 from flask import Flask, render_template, request, redirect
 import time
+import json
+from flask import jsonify
 
 app = Flask(__name__)
 
@@ -19,8 +21,6 @@ def index():
     else:
         return render_template('index.html')
     
-from flask import jsonify
-
 # Add a new global variable to store the received data
 received_data = []
 
@@ -42,8 +42,6 @@ def get_data():
 
         return jsonify(plot_data)
 
-
-import json
 
 def handle_client_connection(conn, addr):
     global current_command, command_processed, received_data
