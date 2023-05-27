@@ -1,14 +1,10 @@
-#Client
-# This client python can geneate the simulated signal
-
-import socket
 import random
 import time
-import select
-import sys
-import json
 import platform
 import uuid
+import json
+import socketio
+import sys
 
 ads1263_available = False
 
@@ -85,43 +81,36 @@ def get_mac_address():
 
 def main(ipaddr, port, use_simulated_data=False):
     mac_address = get_mac_address()
+    sio = socketio.Client()  # Create a Socket.IO client
+
+    @sio.event
+    def connect():
+        sio.emit('mac_address', mac_address)
+        print("Connected to the server")
+
+    @sio.on('sample_count')
+    def on_sample_count(sample_count):
+        print(f"Received sample_count: {sample_count}")
+        duration = sample_count / sampling_rate
+        print("Receive")
+
+        if use_simulated_data or not ads1263_available:
+            random_data, actual_sampling_rate = simulate_adc_data(duration)
+        else:
+            random_data, actual_sampling_rate = collect_adc_data(duration)
+
+        
+        data_to_send = json.dumps(random_data)  # Serialize data
+        sio.emit('data', data_to_send)  # Send the actual data
+        print(f"Sent random data: {random_data}")
+
     while True:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(5)
         try:
-            s.connect((ipaddr, port))
-            s.sendall(mac_address.encode())
-            print("Connected to the server")
-            while True:
-                ready_to_read, ready_to_write, _ = select.select([s], [s], [], 1)
-
-                if ready_to_read:
-                    data = s.recv(1024)
-                    if data:
-                        sample_count = int(data.decode())
-                        print(f"Received sample_count: {sample_count}")
-                        duration = sample_count / sampling_rate
-
-                        if use_simulated_data or not ads1263_available:
-                            random_data, actual_sampling_rate = simulate_adc_data(duration)
-                        else:
-                            random_data, actual_sampling_rate = collect_adc_data(duration)
-
-                        if ready_to_write:
-                            data_to_send = json.dumps(random_data).encode()  # Serialize data to JSON
-                            s.sendall(str(len(data_to_send)).encode().zfill(8))  # Send data length
-                            s.sendall(data_to_send)  # Send the actual data
-                            print(f"Sent random data: {len(random_data)}")
-                    else:
-                        break
-
-                time.sleep(1)
-
-        except socket.error as e:
+            sio.connect(f'http://{ipaddr}:{port}')  # Connect to the server
+            sio.wait()  # Wait for events
+        except socketio.exceptions.ConnectionError as e:
             print(f"Connection failed. Retrying... Error: {e}")
             time.sleep(5)
-        finally:
-            s.close()
 
 
 
@@ -137,5 +126,3 @@ if __name__ == '__main__':
             use_simulated_data = True
 
         main(ipaddr, port, use_simulated_data)
-
-

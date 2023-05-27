@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "serial://dev/tty.usbserial-0001",
+			"uri": "serial://%2fdev%2ftty.usbserial-0001/"
+		},
+		{
+			"name": "serial://dev/tty.usbserial-0001",
+			"uri": "serial://%2fdev%2ftty.usbserial-0001/"
+		}
+	],
+	"settings": {
+		"sqltools.connections": [
+			{
+				"mysqlOptions": {
+					"authProtocol": "default"
+				},
+				"previewLimit": 50,
+				"server": "161.200.87.11",
+				"port": 80,
+				"driver": "MySQL",
+				"name": "GVDB",
+				"database": "gvdb",
+				"username": "admin",
+				"password": "Geoverse5"
+			}
+		]
+	}
+}
