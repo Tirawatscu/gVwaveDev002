@@ -24,7 +24,7 @@ def listen_for_connections():
 
             # Send a response
             data_str = data.decode("utf-8").strip()
-            if data_str == "start":
+            if data_str == "Start":
                 #response = str([random.random() for _ in range(100)])
 
                 # Assuming floats_to_send is your list of floats
