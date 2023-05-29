@@ -3,6 +3,7 @@
 
 import bluetooth
 import random
+import struct
 
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -19,12 +20,20 @@ def listen_for_connections():
     while True:
         try:
             data = client_sock.recv(1024)
-            print("Received: [%s]" % data)
+            #print("Received: [%s]" % data)
 
             # Send a response
             data_str = data.decode("utf-8").strip()
-            if data_str == "trig":
-                response = str([random.random() for _ in range(100)])
+            if data_str == "start":
+                #response = str([random.random() for _ in range(100)])
+
+                # Assuming floats_to_send is your list of floats
+                floats_to_send = [1.1, 2.2, 3.3]
+
+                # Convert the list of floats to bytes
+                response  = struct.pack('f'*len(floats_to_send), *floats_to_send)
+
+                # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
                 response = "false"
             
