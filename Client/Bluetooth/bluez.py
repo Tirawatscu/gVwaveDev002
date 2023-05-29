@@ -31,7 +31,7 @@ def listen_for_connections():
                 floats_to_send = [1.1, 2.2, 3.3]
 
                 # Convert the list of floats to bytes
-                response  = struct.pack('f'*len(floats_to_send), *floats_to_send)
+                response  = struct.pack('<' + 'f'*len(floats_to_send), *floats_to_send)
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
