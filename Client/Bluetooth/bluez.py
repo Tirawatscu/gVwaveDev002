@@ -28,6 +28,7 @@ def listen_for_connections():
             else:
                 response = "false"
             
+            print("Received: [%s]" % data_str)
             client_sock.send(response)
             print("Sent response:", response)
         except Exception as e:
