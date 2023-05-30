@@ -37,8 +37,8 @@ while True:
     output = subp.stdout.readline().decode()
     print(output.strip())
 
-    # If there's an incoming pairing request, automatically accept it
-    if 'Request confirmation' in output: 
+    # If there's an incoming pairing request or a service authorization request, automatically accept it
+    if 'Request confirmation' in output or 'Authorize service' in output:
         # Wait for a moment to ensure the input is correctly received
         time.sleep(1)
         subp.stdin.write('yes\n'.encode())
