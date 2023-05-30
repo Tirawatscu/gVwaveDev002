@@ -26,6 +26,7 @@ initial_commands = [
 
 # Send initial commands
 for command in initial_commands:
+    time.sleep(1)
     subp.stdin.write((command + '\n').encode())
     subp.stdin.flush()
 
