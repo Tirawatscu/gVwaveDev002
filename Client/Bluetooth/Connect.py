@@ -2,6 +2,7 @@ import subprocess
 import select
 import os
 import fcntl
+import time
 
 # Open a subprocess with bluetoothctl
 subp = subprocess.Popen(
@@ -36,6 +37,8 @@ while True:
     print(output.strip())
 
     # If there's an incoming pairing request, automatically accept it
-    if 'Authorize service' in output or 'Confirm passkey' in output:
+    if 'Request confirmation' in output: 
+        # Wait for a moment to ensure the input is correctly received
+        time.sleep(1)
         subp.stdin.write('yes\n'.encode())
         subp.stdin.flush()
