@@ -35,11 +35,7 @@ while True:
     output = subp.stdout.readline().decode()
     print(output.strip())
 
+    # If there's an incoming pairing request, automatically accept it
     if 'Authorize service' in output or 'Confirm passkey' in output:
-        response = input('Allow device to connect? (yes/no): ')
-        if response.lower() == 'yes':
-            subp.stdin.write('yes\n'.encode())
-            subp.stdin.flush()
-        else:
-            subp.stdin.write('no\n'.encode())
-            subp.stdin.flush()
+        subp.stdin.write('yes\n'.encode())
+        subp.stdin.flush()
