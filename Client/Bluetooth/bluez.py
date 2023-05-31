@@ -26,18 +26,12 @@ def listen_for_connections():
             data_str = data.decode("utf-8").strip()
             if data_str == "Start":
                 floats_to_send = [1.1, 2.2, 3.3]
-
-                # Convert the list of floats to a space-separated string
-                floats_str = ' '.join(map(str, floats_to_send))
-                
-                # Encode this string to bytes
-                bytes_str = floats_str.encode()
-
-                # Convert bytes to integers for Uint8List
-                uint8_list = [int(b) for b in bytes_str]
+                byte_data = b''
+                for float_val in floats_to_send:
+                    byte_data += struct.pack('f', float_val)
                 
                 # Now pack this uint8 list to bytes
-                response = bytes(uint8_list)
+                response = byte_data
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
