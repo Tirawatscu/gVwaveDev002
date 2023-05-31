@@ -49,7 +49,10 @@ while True:
 
     # If the device is paired, break the loop to start data transfer
     if 'Paired: yes' in output:
+        time.sleep(1)
         break
+
+
 
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -85,5 +88,6 @@ def listen_for_connections():
 
     client_sock.close()  # this won't be reached in the current setup
     server_sock.close()
-
+    
+subp.terminate()
 listen_for_connections()
