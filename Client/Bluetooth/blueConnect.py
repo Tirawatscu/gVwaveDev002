@@ -95,7 +95,7 @@ if not check_existing_connections():
 
         if 'Paired: yes' in output:
             break
-
+    time.sleep(2)
     subp.terminate()
 
 listen_for_connections()
