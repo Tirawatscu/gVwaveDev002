@@ -39,10 +39,10 @@ def listen_for_connections():
             # Send a response
             data_str = data.decode("utf-8").strip()
             if data_str == "Start":
-                floats_to_send = [1.1, 2.2, 3.3]
+                floats_to_send = [1.1123, 2.2231, 3.3644]
                 byte_data = b''
                 for float_val in floats_to_send:
-                    byte_data += struct.pack('f', float_val)
+                    byte_data += struct.pack('<f', float_val)
                 
                 # Now pack this uint8 list to bytes
                 response = byte_data
