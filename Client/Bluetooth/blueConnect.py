@@ -133,7 +133,7 @@ if __name__ == '__main__':
     mainloop = GLib.MainLoop()
 
     # Start listening for connections after a delay
-    GLib.timeout_add_seconds(2, listen_for_connections)
+    #GLib.timeout_add_seconds(2, listen_for_connections)
 
     try:
         mainloop.run()
