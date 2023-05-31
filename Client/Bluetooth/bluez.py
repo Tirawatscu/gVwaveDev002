@@ -25,14 +25,19 @@ def listen_for_connections():
             # Send a response
             data_str = data.decode("utf-8").strip()
             if data_str == "Start":
-                #response = str([random.random() for _ in range(100)])
-
-                # Assuming floats_to_send is your list of floats
                 floats_to_send = [1.1, 2.2, 3.3]
 
-                # Convert the list of floats to bytes
-                #response  = struct.pack('<' + 'f'*len(floats_to_send), *floats_to_send)
-                response  = struct.pack('%sf' % len(floats_to_send), *floats_to_send)
+                # Convert the list of floats to a space-separated string
+                floats_str = ' '.join(map(str, floats_to_send))
+                
+                # Encode this string to bytes
+                bytes_str = floats_str.encode()
+
+                # Convert bytes to integers for Uint8List
+                uint8_list = [int(b) for b in bytes_str]
+                
+                # Now pack this uint8 list to bytes
+                response = bytes(uint8_list)
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
