@@ -7,53 +7,6 @@ import bluetooth
 import random
 import struct
 
-# Open a subprocess with bluetoothctl
-subp = subprocess.Popen(
-    ['bluetoothctl'], 
-    stdin=subprocess.PIPE, 
-    stdout=subprocess.PIPE, 
-    stderr=subprocess.PIPE)
-
-# Set the O_NONBLOCK flag of subp.stdout file descriptor:
-flags = fcntl.fcntl(subp.stdout, fcntl.F_GETFL)  # get current subp.stdout flags
-fcntl.fcntl(subp.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
-
-# Commands to run initially
-initial_commands = [
-    'power on',
-    'agent on',
-    'default-agent',
-    'discoverable on',
-    'pairable on',
-]
-
-# Send initial commands
-for command in initial_commands:
-    time.sleep(1)
-    subp.stdin.write((command + '\n').encode())
-    subp.stdin.flush()
-
-while True:
-    # Wait for data to be available on subp.stdout
-    select.select([subp.stdout], [], [])
-
-    output = subp.stdout.readline().decode()
-    print(output.strip())
-
-    # If there's an incoming pairing request or a service authorization request, automatically accept it
-    if 'Request confirmation' in output or 'Authorize service' in output:
-        # Wait for a moment to ensure the input is correctly received
-        time.sleep(1)
-        subp.stdin.write('yes\n'.encode())
-        subp.stdin.flush()
-
-    # If the device is paired, break the loop to start data transfer
-    if 'Paired: yes' in output:
-        time.sleep(1)
-        break
-
-
-
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 
@@ -89,5 +42,61 @@ def listen_for_connections():
     client_sock.close()  # this won't be reached in the current setup
     server_sock.close()
     
-subp.terminate()
+
+# Check for existing connections
+def check_existing_connections():
+    result = subprocess.run(['bluetoothctl', 'info'], stdout=subprocess.PIPE)
+    lines = result.stdout.decode('utf-8').splitlines()
+    for line in lines:
+        if 'Connected: yes' in line:
+            return True
+    return False
+
+if not check_existing_connections():
+    # Open a subprocess with bluetoothctl
+    subp = subprocess.Popen(
+        ['bluetoothctl'], 
+        stdin=subprocess.PIPE, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE)
+
+    # Set the O_NONBLOCK flag of subp.stdout file descriptor:
+    flags = fcntl.fcntl(subp.stdout, fcntl.F_GETFL)  # get current subp.stdout flags
+    fcntl.fcntl(subp.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
+    # Commands to run initially
+    initial_commands = [
+        'power on',
+        'agent on',
+        'default-agent',
+        'discoverable on',
+        'pairable on',
+    ]
+
+    # Send initial commands
+    for command in initial_commands:
+        time.sleep(1)
+        subp.stdin.write((command + '\n').encode())
+        subp.stdin.flush()
+
+    while True:
+        # Wait for data to be available on subp.stdout
+        select.select([subp.stdout], [], [])
+
+        output = subp.stdout.readline().decode()
+        print(output.strip())
+
+        # If there's an incoming pairing request or a service authorization request, automatically accept it
+        if 'Request confirmation' in output or 'Authorize service' in output:
+            # Wait for a moment to ensure the input is correctly received
+            time.sleep(2)
+            subp.stdin.write('yes\n'.encode())
+            subp.stdin.flush()
+
+        if 'Paired: yes' in output:
+            break
+
+    subp.terminate()
+
 listen_for_connections()
+
