@@ -1,11 +1,22 @@
-import subprocess
-import select
-import os
-import fcntl
-import time
+import dbus
+import dbus.service
+import dbus.mainloop.glib
+from gi.repository import GLib
 import bluetooth
 import random
 import struct
+
+BUS_NAME = 'org.bluez'
+ADAPTER_IFACE = 'org.bluez.Adapter1'
+ADAPTER_ROOT = '/org/bluez/hci'
+AGENT_IFACE = 'org.bluez.Agent1'
+AGNT_MNGR_IFACE = 'org.bluez.AgentManager1'
+AGENT_PATH = '/my/app/agent'
+AGNT_MNGR_PATH = '/org/bluez'
+CAPABILITY = 'KeyboardDisplay'
+DEVICE_IFACE = 'org.bluez.Device1'
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+bus = dbus.SystemBus()
 
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -22,6 +33,7 @@ def listen_for_connections():
     while True:
         try:
             data = client_sock.recv(1024)
+            #print("Received: [%s]" % data)
 
             # Send a response
             data_str = data.decode("utf-8").strip()
@@ -39,64 +51,89 @@ def listen_for_connections():
             client_sock, address = server_sock.accept()
             print("Accepted connection from", address)
 
-    client_sock.close()  # this won't be reached in the current setup
+    client_sock.close()
     server_sock.close()
-    
 
-# Check for existing connections
-def check_existing_connections():
-    result = subprocess.run(['bluetoothctl', 'info'], stdout=subprocess.PIPE)
-    lines = result.stdout.decode('utf-8').splitlines()
-    for line in lines:
-        if 'Connected: yes' in line:
-            return True
-    return False
+def set_trusted(path):
+    props = dbus.Interface(bus.get_object(BUS_NAME, path), dbus.PROPERTIES_IFACE)
+    props.Set(DEVICE_IFACE, "Trusted", True)
 
-if not check_existing_connections():
-    # Open a subprocess with bluetoothctl
-    subp = subprocess.Popen(
-        ['bluetoothctl'], 
-        stdin=subprocess.PIPE, 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE)
+class Agent(dbus.service.Object):
 
-    # Set the O_NONBLOCK flag of subp.stdout file descriptor:
-    flags = fcntl.fcntl(subp.stdout, fcntl.F_GETFL)  # get current subp.stdout flags
-    fcntl.fcntl(subp.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="", out_signature="")
+    def Release(self):
+        print("Release")
 
-    # Commands to run initially
-    initial_commands = [
-        'power on',
-        'agent on',
-        'default-agent',
-        'discoverable on',
-        'pairable on',
-    ]
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature='o', out_signature='s')
+    def RequestPinCode(self, device):
+        print(f'RequestPinCode {device}')
+        return '0000'
 
-    # Send initial commands
-    for command in initial_commands:
-        time.sleep(1)
-        subp.stdin.write((command + '\n').encode())
-        subp.stdin.flush()
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="ou", out_signature="")
+    def RequestConfirmation(self, device, passkey):
+        print("RequestConfirmation (%s, %06d)" % (device, passkey))
+        set_trusted(device)
+        return
 
-    while True:
-        # Wait for data to be available on subp.stdout
-        select.select([subp.stdout], [], [])
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="o", out_signature="")
+    def RequestAuthorization(self, device):
+        print("RequestAuthorization (%s)" % (device))
+        set_trusted(device)
+        return
 
-        output = subp.stdout.readline().decode()
-        print(output.strip())
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="o", out_signature="u")
+    def RequestPasskey(self, device):
+        print("RequestPasskey (%s)" % (device))
+        set_trusted(device)
+        passkey = input("Enter passkey: ")
+        return dbus.UInt32(passkey)
 
-        # If there's an incoming pairing request or a service authorization request, automatically accept it
-        if 'Request confirmation' in output or 'Authorize service' in output:
-            # Wait for a moment to ensure the input is correctly received
-            time.sleep(2)
-            subp.stdin.write('yes\n'.encode())
-            subp.stdin.flush()
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="ouq", out_signature="")
+    def DisplayPasskey(self, device, passkey, entered):
+        print("DisplayPasskey (%s, %06u entered %u)" %
+              (device, passkey, entered))
 
-        if 'Paired: yes' in output:
-            break
-    time.sleep(2)
-    subp.terminate()
+    @dbus.service.method(AGENT_IFACE,
+                         in_signature="os", out_signature="")
+    def DisplayPinCode(self, device, pincode):
+        print("DisplayPinCode (%s, %s)" % (device, pincode))
 
-listen_for_connections()
+class Adapter:
+    def __init__(self, idx=0):
+        bus = dbus.SystemBus()
+        self.path = f'{ADAPTER_ROOT}{idx}'
+        self.adapter_object = bus.get_object(BUS_NAME, self.path)
+        self.adapter_props = dbus.Interface(self.adapter_object,
+                                            dbus.PROPERTIES_IFACE)
+        self.adapter_props.Set(ADAPTER_IFACE,
+                               'DiscoverableTimeout', dbus.UInt32(0))
+        self.adapter_props.Set(ADAPTER_IFACE,
+                               'Discoverable', True)
+        self.adapter_props.Set(ADAPTER_IFACE,
+                               'PairableTimeout', dbus.UInt32(0))
+        self.adapter_props.Set(ADAPTER_IFACE,
+                               'Pairable', True)
 
+
+if __name__ == '__main__':
+    agent = Agent(bus, AGENT_PATH)
+    agnt_mngr = dbus.Interface(bus.get_object(BUS_NAME, AGNT_MNGR_PATH),
+                               AGNT_MNGR_IFACE)
+    agnt_mngr.RegisterAgent(AGENT_PATH, CAPABILITY)
+    agnt_mngr.RequestDefaultAgent(AGENT_PATH)
+
+    adapter = Adapter()
+    listen_for_connections()
+
+    mainloop = GLib.MainLoop()
+    try:
+        mainloop.run()
+    except KeyboardInterrupt:
+        agnt_mngr.UnregisterAgent(AGENT_PATH)
+        mainloop.quit()
