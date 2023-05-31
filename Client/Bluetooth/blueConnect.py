@@ -40,7 +40,14 @@ def listen_for_connections():
             data_str = data.decode("utf-8").strip()
             if data_str == "Start":
                 floats_to_send = [1.1, 2.2, 3.3]
-                response  = struct.pack('%sf' % len(floats_to_send), *floats_to_send)
+                byte_data = b''
+                for float_val in floats_to_send:
+                    byte_data += struct.pack('f', float_val)
+                
+                # Now pack this uint8 list to bytes
+                response = byte_data
+
+                # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
                 response = "No Response"
             
@@ -52,7 +59,7 @@ def listen_for_connections():
             client_sock, address = server_sock.accept()
             print("Accepted connection from", address)
 
-    client_sock.close()
+    client_sock.close()  # this won't be reached in the current setup
     server_sock.close()
 
 def set_trusted(path):
