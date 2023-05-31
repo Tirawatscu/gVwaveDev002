@@ -5,6 +5,7 @@ from gi.repository import GLib
 import bluetooth
 import random
 import struct
+import time
 
 BUS_NAME = 'org.bluez'
 ADAPTER_IFACE = 'org.bluez.Adapter1'
@@ -77,7 +78,8 @@ class Agent(dbus.service.Object):
         print("RequestConfirmation (%s, %06d)" % (device, passkey))
         set_trusted(device)
         
-        listen_for_connections()
+        time.sleep(5)
+        mainloop.quit()
         
         return
 
@@ -143,3 +145,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         agnt_mngr.UnregisterAgent(AGENT_PATH)
         mainloop.quit()
+
+    listen_for_connections()
