@@ -76,6 +76,9 @@ class Agent(dbus.service.Object):
     def RequestConfirmation(self, device, passkey):
         print("RequestConfirmation (%s, %06d)" % (device, passkey))
         set_trusted(device)
+        
+        listen_for_connections()
+        
         return
 
     @dbus.service.method(AGENT_IFACE,
