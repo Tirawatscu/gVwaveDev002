@@ -37,7 +37,7 @@ def listen_for_connections():
             if data_str == "Start":
 
                 # Generate 2000 random floats between -1 and 1
-                floats_to_send = [round(random.uniform(-1, 1), 5) for _ in range(10)]
+                floats_to_send = [round(random.uniform(-1, 1), 5) for _ in range(100)]
                 # Convert each float to string and join them into a single string
                 string_data = 'START\n' + ','.join(map(str, floats_to_send)) + '\nEND'
 
@@ -51,7 +51,7 @@ def listen_for_connections():
                 for i in range(0, len(byte_data), chunk_size):
                     send_data(client_sock, byte_data[i:i+chunk_size])
                     time.sleep(0.1)
-                
+                print(floats_to_send)
                 print('complete')    
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
