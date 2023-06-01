@@ -12,6 +12,7 @@ def send_data(sock, data):
         if sent == 0:
             raise RuntimeError("socket connection broken")
         total_sent = total_sent + sent
+        print(total_sent)
 
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
