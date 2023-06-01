@@ -44,7 +44,7 @@ def listen_for_connections():
                 byte_data = string_data.encode('utf-8')
 
                 # Chunk size
-                chunk_size = 1024  # You can adjust this value
+                chunk_size = 256  # You can adjust this value
 
                 # Send the byte data in chunks
                 for i in range(0, len(byte_data), chunk_size):
