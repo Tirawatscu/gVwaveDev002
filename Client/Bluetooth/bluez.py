@@ -36,7 +36,7 @@ def listen_for_connections():
             if data_str == "Start":
 
                 # Generate 2000 random floats between -1 and 1
-                floats_to_send = [round(random.uniform(-1, 1), 5) for _ in range(2000)]
+                floats_to_send = [round(random.uniform(-1, 1), 5) for _ in range(100)]
                 # Convert each float to string and join them into a single string
                 string_data = 'START\n' + ','.join(map(str, floats_to_send)) + '\nEND'
 
