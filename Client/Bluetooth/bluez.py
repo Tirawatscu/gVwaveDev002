@@ -5,6 +5,14 @@ import bluetooth
 import random
 import struct
 
+def send_data(sock, data):
+    total_sent = 0
+    while total_sent < len(data):
+        sent = sock.send(data[total_sent:])
+        if sent == 0:
+            raise RuntimeError("socket connection broken")
+        total_sent = total_sent + sent
+
 def listen_for_connections():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 
@@ -39,17 +47,14 @@ def listen_for_connections():
 
                 # Send the byte data in chunks
                 for i in range(0, len(byte_data), chunk_size):
-                    client_sock.send(byte_data[i:i+chunk_size])
+                    send_data(client_sock, byte_data[i:i+chunk_size])
                 
                 print('complete')    
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
                 response = "No Response"
-            
-            '''print("Received: [%s]" % data_str)
-            client_sock.send(response)
-            print("Sent response:", response)'''
+
         except Exception as e:
             print(f"An error occurred: {e}")
             client_sock, address = server_sock.accept()
