@@ -28,24 +28,28 @@ def listen_for_connections():
 
                 # Generate 2000 random floats between -1 and 1
                 floats_to_send = [round(random.uniform(-1, 1), 5) for _ in range(2000)]
-
-                #floats_to_send = [1.1123, 2.2231, 3.3644]
                 # Convert each float to string and join them into a single string
                 string_data = ','.join(map(str, floats_to_send))
 
+
                 # Convert the string to bytes
                 byte_data = string_data.encode('utf-8')
-                
-                # Now pack this uint8 list to bytes
-                response = byte_data
+
+
+                # Chunk size
+                chunk_size = 1024  # You can adjust this value
+
+                # Send the byte data in chunks
+                for i in range(0, len(byte_data), chunk_size):
+                    client_sock.send(byte_data[i:i+chunk_size])
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
             else:
                 response = "No Response"
             
-            print("Received: [%s]" % data_str)
+            '''print("Received: [%s]" % data_str)
             client_sock.send(response)
-            print("Sent response:", response)
+            print("Sent response:", response)'''
         except Exception as e:
             print(f"An error occurred: {e}")
             client_sock, address = server_sock.accept()
