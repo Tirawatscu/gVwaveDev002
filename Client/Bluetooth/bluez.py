@@ -4,6 +4,7 @@
 import bluetooth
 import random
 import struct
+import time
 
 def send_data(sock, data):
     total_sent = 0
@@ -49,6 +50,7 @@ def listen_for_connections():
                 # Send the byte data in chunks
                 for i in range(0, len(byte_data), chunk_size):
                     send_data(client_sock, byte_data[i:i+chunk_size])
+                    time.sleep(0.1)
                 
                 print('complete')    
 
