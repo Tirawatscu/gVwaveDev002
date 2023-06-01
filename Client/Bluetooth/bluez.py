@@ -41,7 +41,9 @@ def listen_for_connections():
 
                 # Send the byte data in chunks
                 for i in range(0, len(byte_data), chunk_size):
-                    client_sock.send(byte_data[i:i+chunk_size])
+                    chunk = byte_data[i:i+chunk_size]
+                    chunk += b'\n'
+                    client_sock.send(chunk)
                 print("send complete")
 
                 # At this point, bytes_to_send can be sent using a BLE library in Python
