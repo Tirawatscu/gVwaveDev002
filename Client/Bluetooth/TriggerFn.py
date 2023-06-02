@@ -4,7 +4,7 @@ import ADS1263
 import RPi.GPIO as GPIO
 
 # Define the trigger threshold
-TRIGGER_THRESHOLD = 1.500
+TRIGGER_THRESHOLD = 0.3
 # Define the pre and post-trigger times (in seconds)
 PRE_TRIGGER_TIME = 0.25
 POST_TRIGGER_TIME = 0.75
