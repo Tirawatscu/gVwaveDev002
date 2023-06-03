@@ -25,7 +25,7 @@ try:
 except ImportError:
     print("ADS1263 library not available, using simulated data")
 
-sampling_rate = 2000  # Hz
+sampling_rate = 1000  # Hz
 interval = 1 / sampling_rate
 
 # Buffer to store the values
