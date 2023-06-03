@@ -58,7 +58,7 @@ def send_data_over_bluetooth(data):
     byte_data = string_data.encode('utf-8')
 
     # Chunk size
-    chunk_size = 8192  # You can adjust this value
+    chunk_size = 12000  # You can adjust this value
 
     # Send the byte data in chunks
     for i in range(0, len(byte_data), chunk_size):
@@ -68,7 +68,7 @@ def send_data_over_bluetooth(data):
             if sent == 0:
                 raise RuntimeError("socket connection broken")
             total_sent = total_sent + sent
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
 def collect_adc_data(duration):
     ADC_Value_List = []
