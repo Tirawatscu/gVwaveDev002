@@ -51,13 +51,14 @@ client_sock, address = server_sock.accept()
 print("Accepted connection from", address)
 
 def send_data_over_bluetooth(data):
+    print(f"Send {len(data)} sample")
     # Convert data to string format and join them into a single string
     string_data = 'START\n' + ','.join(map(str, data)) + '\nEND'
     # Convert the string to bytes
     byte_data = string_data.encode('utf-8')
 
     # Chunk size
-    chunk_size = 2048  # You can adjust this value
+    chunk_size = 8192  # You can adjust this value
 
     # Send the byte data in chunks
     for i in range(0, len(byte_data), chunk_size):
@@ -68,6 +69,18 @@ def send_data_over_bluetooth(data):
                 raise RuntimeError("socket connection broken")
             total_sent = total_sent + sent
         time.sleep(0.1)
+
+def collect_adc_data(duration):
+    ADC_Value_List = []
+    start_time = time.time()
+    no_sample = duration * sampling_rate
+    while len(ADC_Value_List) < no_sample:
+        current_time = time.time()
+        if current_time >= start_time:
+            ADC_Value = read_adc()
+            ADC_Value_List.append(ADC_Value)
+            start_time += interval
+    return ADC_Value_List
 
 # Monitor the signal
 while True:
@@ -81,12 +94,10 @@ while True:
     # If the value is above the trigger threshold, collect post-trigger samples
     if value >= TRIGGER_THRESHOLD:
         print(f"Trigger condition met at value: {value}")
-        trigger_time = time.time()
-        while time.time() - trigger_time < POST_TRIGGER_TIME:
-            value = read_adc()
-            buffer.append(value)
+        post_trigger_samples = collect_adc_data(POST_TRIGGER_TIME)
+        buffer.extend(post_trigger_samples)
 
-        # Here you can send the buffer over Bluetooth
+        # Here you can send the data over Bluetooth
         send_data_over_bluetooth(buffer)
         buffer = []
         
