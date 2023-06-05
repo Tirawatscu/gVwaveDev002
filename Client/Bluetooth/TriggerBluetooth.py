@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import bluetooth
 
 # Define the trigger threshold
-TRIGGER_THRESHOLD = 0.3
+TRIGGER_THRESHOLD = 0.1
 # Define the pre and post-trigger times (in seconds)
 PRE_TRIGGER_TIME = 0.25
 POST_TRIGGER_TIME = 0.75
